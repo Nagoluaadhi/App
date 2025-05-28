@@ -34,9 +34,9 @@ export default function Dashboard() {
           <p className="text-2xl text-red-500">{stats.stockOut}</p>
         </div>
         <div className="bg-white p-4 shadow rounded">
-          <h3 className="text-lg font-semibold text-gray-700">📦 Inventory Items</h3>
-          <p className="text-2xl text-blue-600">{stats.inventory}</p>
-        </div>
+          <h3 className="text-lg font-semibold text-gray-700">💰 Total Client Balance</h3>
+          <p className="text-2xl text-blue-600">{stats.perClient.reduce((sum, c) => sum + c.balance, 0)}</p>
+          </div>
       </div>
 
       <h3 className="text-lg font-semibold mb-2">Per User StockOut</h3>
