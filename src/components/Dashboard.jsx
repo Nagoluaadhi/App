@@ -35,7 +35,7 @@ export default function Dashboard() {
         </div>
         <div className="bg-white p-4 shadow rounded">
           <h3 className="text-lg font-semibold text-gray-700">💰 Total Client Balance</h3>
-          <p className="text-2xl text-blue-600">{stats.perClient.reduce((sum, c) => sum + c.balance, 0)}</p>
+          <p className="text-2xl text-blue-600">{stats.perClient.reduce((sum, c) => sum + c.balance, 0).toLocaleString()}</p>
           </div>
       </div>
 
