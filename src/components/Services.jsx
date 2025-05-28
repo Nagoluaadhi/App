@@ -22,6 +22,7 @@ export default function Services() {
   const [services, setServices] = useState([]);
   const [barcodes, setBarcodes] = useState([]);
   const [scannerVisible, setScannerVisible] = useState(false);
+  if (!user || !user.id) return alert('User not logged in');
 
   useEffect(() => {
     loadData();
@@ -41,13 +42,14 @@ export default function Services() {
       return;
     }
     const initialBarcodes = [value, ...Array(qty - 1).fill('')];
-    setForm({ ...form, barcode: value });
+    setForm(prev => ({ ...prev, barcode: value }));
     setBarcodes(initialBarcodes);
     setScannerVisible(false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!user || !user.id) return alert('User not logged in');
 
     const qty = parseInt(form.qty);
     if (!form.client_id || !form.date_time || !qty || barcodes.length !== qty || barcodes.includes('')) {
@@ -56,12 +58,11 @@ export default function Services() {
     }
 
     try {
-      for (const code of barcodes) {
-        await axios.post('/api/services', {
-          ...form,
-          barcode: barcodes,
-        });
-      }
+    await axios.post('/api/services', {
+      ...form,
+      barcodes,
+      user_id: user.id
+    });
 
       setForm({
         client_id: '',
