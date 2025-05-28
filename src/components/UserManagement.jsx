@@ -170,7 +170,7 @@ const loadInventory = async () => {
         </tbody>
       </table>
 
-      <h3 className="text-md font-semibold mb-2">Create Inventory</h3>
+      <h3 className="text-md font-semibold mb-2">Create Items</h3>
       <form onSubmit={handleInventorySubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <input
           type="text"
