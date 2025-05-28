@@ -22,7 +22,7 @@ export default function Services() {
   const [services, setServices] = useState([]);
   const [barcodes, setBarcodes] = useState([]);
   const [scannerVisible, setScannerVisible] = useState(false);
-  if (!user || !user.id) return alert('User not logged in');
+  const user = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
     loadData();
