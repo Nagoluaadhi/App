@@ -197,10 +197,10 @@ const loadInventory = async () => {
         <button
           type="submit"
           className="bg-blue-600 text-white px-6 py-2 rounded w-auto"
-        >Create Inventory</button>
+        >Create Items</button>
         </div>
       </form>
-      <h3 className="text-md font-semibold mb-2">Existing Inventory</h3>
+      <h3 className="text-md font-semibold mb-2">Existing Items</h3>
       <table className="w-full text-sm border">
         <thead className="bg-gray-100">
           <tr>
