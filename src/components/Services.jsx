@@ -59,8 +59,7 @@ export default function Services() {
       for (const code of barcodes) {
         await axios.post('/api/services', {
           ...form,
-          barcode: code,
-          qty: 1
+          barcode: barcodes,
         });
       }
 
