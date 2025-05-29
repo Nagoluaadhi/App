@@ -178,12 +178,8 @@ const deleteClient = async (id) => {
               <td className="border px-2 py-1">{user.username}</td>
               <td className="border px-2 py-1">{user.role}</td>
               <td className="border px-2 py-1">
-                <button
-                  onClick={() => deleteUser(user.id)}
-                  className="bg-red-600 text-white px-2 py-1 text-xs rounded"
-                >
-                  Delete
-                </button>
+                <button onClick={() => deleteUser(user.id)} className="bg-red-600 text-white px-2 py-1 text-xs rounded cursor-pointer">Delete</button>
+
               </td>
             </tr>
           ))}
