@@ -57,7 +57,6 @@ function App() {
             <Route path="dashboard" element={<Dashboard />} />  
               <Route path="stockout" element={<Stockout />} />
               <Route path="services" element={<Services />} />
-              <Route path="report" element={<Report />} />
             </>
           )}
 
