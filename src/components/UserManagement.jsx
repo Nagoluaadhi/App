@@ -75,7 +75,7 @@ const loadInventory = async () => {
   } catch (err) {
     console.error('Delete user error:', err);
     if (err.response?.status === 400) {
-      alert(err.response.data.error); // e.g., "linked records exist"
+      alert('This user is in use and cannot be deleted.');
     } else if (err.response?.status === 404) {
       alert('User not found.');
     } else {
@@ -83,9 +83,7 @@ const loadInventory = async () => {
     }
   }
 };
-
-
- const deleteClient = async (id) => {
+const deleteClient = async (id) => {
   if (!window.confirm('Are you sure you want to delete this client?')) return;
 
   try {
@@ -95,7 +93,7 @@ const loadInventory = async () => {
   } catch (err) {
     console.error('Delete client error:', err);
     if (err.response?.status === 400) {
-      alert(err.response.data.error); // e.g., "Client is in use"
+      alert('This client is in use and cannot be deleted.');
     } else if (err.response?.status === 404) {
       alert('Client not found.');
     } else {
@@ -103,8 +101,6 @@ const loadInventory = async () => {
     }
   }
 };
-
-
   const deleteInventory = async (id) => {
   if (!window.confirm('Are you sure you want to delete this inventory item?')) return;
 
