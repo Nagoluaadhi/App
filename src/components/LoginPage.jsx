@@ -19,15 +19,7 @@ function LoginPage({ setUser }) {
       setUser(res.data);
 
       // Redirect based on role
-      if (res.data.role === 'admin') {
-        navigate('/app/dashboard');
-      } else {
-        navigate('/app/outward');
-      }
-    } catch {
-      alert('Login failed');
-    }
-  };
+      navigate('/app/dashboard');
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
