@@ -23,6 +23,8 @@ export default function Services() {
   const [barcodes, setBarcodes] = useState([]);
   const [scannerVisible, setScannerVisible] = useState(false);
   const user = JSON.parse(localStorage.getItem('user'));
+  const userRole = localStorage.getItem('role'); // add this
+  const barcodeRefs = useRef([]);
 
   useEffect(() => {
     loadData();
@@ -42,7 +44,7 @@ export default function Services() {
       return;
     }
     const initialBarcodes = [value, ...Array(qty - 1).fill('')];
-    setForm(prev => ({ ...prev, barcode: value }));
+    setForm({ ...form, barcode: value });
     setBarcodes(initialBarcodes);
     setScannerVisible(false);
   };
@@ -58,11 +60,13 @@ export default function Services() {
     }
 
     try {
-    await axios.post('/api/services', {
-      ...form,
-      barcodes,
-      user_id: user.id
-    });
+      for (const code of barcodes) {
+        await axios.post('/api/services', {
+          ...form,
+          barcodes,
+          user_id: user.id
+        });
+      }
 
       setForm({
         client_id: '',
@@ -158,18 +162,25 @@ export default function Services() {
           <h3 className="font-semibold mb-2">Enter Barcodes</h3>
           <div className="grid grid-cols-5 gap-2">
             {barcodes.map((code, idx) => (
-              <input
-                key={idx}
-                type="text"
-                value={code}
-                onChange={(e) => {
-                  const updated = [...barcodes];
-                  updated[idx] = e.target.value;
-                  setBarcodes(updated);
-                }}
-                className="p-2 border border-gray-400 rounded"
-              />
-            ))}
+  <input
+    key={idx}
+    ref={el => barcodeRefs.current[idx] = el}
+    type="text"
+    value={code}
+    onChange={(e) => {
+      const updated = [...barcodes];
+      updated[idx] = e.target.value;
+      setBarcodes(updated);
+
+      // Auto-focus next input
+      if (e.target.value && barcodeRefs.current[idx + 1]) {
+        barcodeRefs.current[idx + 1].focus();
+      }
+    }}
+    className="p-2 border border-gray-400 rounded"
+  />
+))}
+
           </div>
         </div>
       )}
