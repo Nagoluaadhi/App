@@ -224,7 +224,6 @@ const deleteClient = async (id) => {
           <tr>
             <th className="border px-2 py-1">ID</th>
             <th className="border px-2 py-1">Item Name</th>
-            <th className="border px-2 py-1">Model No</th>
             <th className="border px-2 py-1">Remark</th>
             <th className="border px-2 py-1">Action</th>
           </tr>
@@ -234,7 +233,6 @@ const deleteClient = async (id) => {
             <tr key={inventory.id}>
               <td className="border px-2 py-1">{inventory.id}</td>
               <td className="border px-2 py-1">{inventory.item_name}</td>
-              <td className="border px-2 py-1">{inventory.model_no}</td>
               <td className="border px-2 py-1">{inventory.remark}</td>
               <td className="border px-2 py-1">
                 <button
