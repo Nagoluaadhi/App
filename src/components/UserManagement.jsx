@@ -76,7 +76,7 @@ const loadInventory = async () => {
     console.error('Delete user error:', err);
 
     if (err.response?.status === 400) {
-      alert(err.response.data?.error || 'This user is in use and cannot be deleted.');
+      alert('This User is in use and cannot be deleted.');
     } else if (err.response?.status === 404) {
       alert('User not found.');
     } else {
@@ -113,7 +113,7 @@ const deleteClient = async (id) => {
   } catch (err) {
     console.error('Delete inventory failed:', err);
     if (err.response?.status === 400) {
-      alert(err.response.data.error); // "Cannot delete inventory..." from backend
+      alert('This Item is in use and cannot be deleted.'); 
     } else if (err.response?.status === 404) {
       alert('Inventory item not found.');
     } else {
