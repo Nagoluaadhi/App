@@ -25,6 +25,8 @@ export default function Stockout() {
   const [clientQty, setClientQty] = useState(null);
   const [userUsageQty, setUserUsageQty] = useState(null);
   const user = JSON.parse(localStorage.getItem('user'));
+  const userRole = localStorage.getItem('role');
+  const barcodeRefs = useRef([])
 
   useEffect(() => {
     loadDropdowns();
@@ -165,7 +167,7 @@ export default function Stockout() {
           {scannerVisible && <BarcodeScanner onScan={handleScan} />}
         </div>
 
-        <input type="text" placeholder="Invoice No" value={form.invoice_no} onChange={(e) => setForm({ ...form, invoice_no: e.target.value })} className="p-2 border rounded" />
+        <input type="text" placeholder="Invoice No" value={form.invoice_no} onChange={(e) => setForm({ ...form, invoice_no: e.target.value })} className="p-2 border rounded" disabled={userRole === 'user'}/>
         <input type="number" placeholder="Quantity" value={form.qty} onChange={(e) => {
           const q = parseInt(e.target.value || '1');
           setForm({ ...form, qty: e.target.value });
@@ -186,18 +188,25 @@ export default function Stockout() {
           <h3 className="font-semibold mb-2">Enter Barcodes</h3>
           <div className="grid grid-cols-5 gap-2">
             {barcodes.map((code, idx) => (
-              <input
-                key={idx}
-                type="text"
-                value={code}
-                onChange={(e) => {
-                  const updated = [...barcodes];
-                  updated[idx] = e.target.value;
-                  setBarcodes(updated);
-                }}
-                className="p-2 border border-gray-400 rounded"
-              />
-            ))}
+  <input
+    key={idx}
+    ref={el => barcodeRefs.current[idx] = el}
+    type="text"
+    value={code}
+    onChange={(e) => {
+      const updated = [...barcodes];
+      updated[idx] = e.target.value;
+      setBarcodes(updated);
+
+      // Auto-focus next input if exists and value is not empty
+      if (e.target.value && barcodeRefs.current[idx + 1]) {
+        barcodeRefs.current[idx + 1].focus();
+      }
+    }}
+    className="p-2 border border-gray-400 rounded"
+  />
+))}
+
           </div>
         </div>
       )}
