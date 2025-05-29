@@ -5,7 +5,7 @@ export default function Dashboard() {
   const [stats, setStats] = useState({
     stockIn: 0,
     outward: 0,
-    inventory: 0,
+    totalBalance: 0,
     perUser: [],
     perUserIn: [],
     perClient: []
@@ -35,8 +35,9 @@ export default function Dashboard() {
         </div>
         <div className="bg-white p-4 shadow rounded">
           <h3 className="text-lg font-semibold text-gray-700">💰 Total Balance</h3>
-          <p className="text-2xl text-blue-600">{stats.perClient.reduce((sum, c) => sum + c.balance, 0).toLocaleString()}</p>
-          </div>
+          <p className="text-2xl text-indigo-600">{stats.totalBalance}</p>
+      </div>
+
       </div>
 
       <h3 className="text-lg font-semibold mb-2">Per User StockOut</h3>
