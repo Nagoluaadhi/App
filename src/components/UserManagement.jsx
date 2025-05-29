@@ -5,7 +5,7 @@ export default function UserManagement() {
   const [users, setUsers] = useState([]);
   const [form, setForm] = useState({ username: '', password: '', role: '' });
 
-  const [inventoryForm, setInventoryForm] = useState({ item_name: '', model_no: '', remark: '' });
+  const [inventoryForm, setInventoryForm] = useState({ item_name: '', remark: '' });
   const [clientForm, setClientForm] = useState({ client_name: '', address: '' });
   const [inventory, setInventory] = useState([]);
 
@@ -54,7 +54,7 @@ const loadInventory = async () => {
   const handleInventorySubmit = async (e) => {
     e.preventDefault();
     await axios.post('/api/inventory', inventoryForm);
-    setInventoryForm({ item_name: '', model_no: '', remark: '' });
+    setInventoryForm({ item_name: '', remark: '' });
     loadInventory();
   };
 
