@@ -66,9 +66,24 @@ const loadInventory = async () => {
   };
 
   const deleteUser = async (id) => {
+  if (!window.confirm('Are you sure you want to delete this user?')) return;
+
+  try {
     await axios.delete(`/api/users/${id}`);
+    alert('User deleted successfully');
     loadUsers();
-  };
+  } catch (err) {
+    console.error('Delete user error:', err);
+    if (err.response?.status === 400) {
+      alert(err.response.data.error); // e.g., "linked records exist"
+    } else if (err.response?.status === 404) {
+      alert('User not found.');
+    } else {
+      alert('Server error while deleting user.');
+    }
+  }
+};
+
 
  const deleteClient = async (id) => {
   if (!window.confirm('Are you sure you want to delete this client?')) return;
@@ -78,28 +93,37 @@ const loadInventory = async () => {
     alert('Client deleted successfully');
     loadClients();
   } catch (err) {
-    if (err.response && err.response.status === 400) {
-      alert(err.response.data.error); // Show backend's "client is in use" message
-    } else {
-      alert('Failed to delete client.');
-    }
     console.error('Delete client error:', err);
+    if (err.response?.status === 400) {
+      alert(err.response.data.error); // e.g., "Client is in use"
+    } else if (err.response?.status === 404) {
+      alert('Client not found.');
+    } else {
+      alert('Server error while deleting client.');
+    }
   }
 };
 
+
   const deleteInventory = async (id) => {
   if (!window.confirm('Are you sure you want to delete this inventory item?')) return;
+
   try {
     await axios.delete(`/api/inventory/${id}`);
+    alert('Inventory deleted successfully');
     loadInventory();
   } catch (err) {
-    if (err.response && err.response.status === 400) {
-      alert(err.response.data.error); // Show custom error message
+    console.error('Delete inventory failed:', err);
+    if (err.response?.status === 400) {
+      alert(err.response.data.error); // "Cannot delete inventory..." from backend
+    } else if (err.response?.status === 404) {
+      alert('Inventory item not found.');
     } else {
-      alert('Failed to delete inventory');
+      alert('Server error while deleting inventory.');
     }
   }
 };
+
 
 
 
