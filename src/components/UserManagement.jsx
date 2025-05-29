@@ -73,17 +73,24 @@ const loadInventory = async () => {
     alert('User deleted successfully');
     loadUsers();
   } catch (err) {
-    console.error('Delete user error:', err);
-
-    if (err.response?.status === 400) {
-      alert('This User is in use and cannot be deleted.');
-    } else if (err.response?.status === 404) {
-      alert('User not found.');
+    if (err.response?.status === 409) {
+      // Show confirm dialog if user is in use
+      const forceDelete = window.confirm('This user is in use. Do you want to force delete?');
+      if (forceDelete) {
+        try {
+          await axios.delete(`/api/users/${id}?force=true`);
+          alert('User and associated data deleted');
+          loadUsers();
+        } catch (e) {
+          alert('Force delete failed.');
+        }
+      }
     } else {
-      alert('Server error while deleting user.');
+      alert('Delete failed.');
     }
   }
 };
+
 
 const deleteClient = async (id) => {
   if (!window.confirm('Are you sure you want to delete this client?')) return;
@@ -93,16 +100,23 @@ const deleteClient = async (id) => {
     alert('Client deleted successfully');
     loadClients();
   } catch (err) {
-    console.error('Delete client error:', err);
-    if (err.response?.status === 400) {
-      alert('This client is in use and cannot be deleted.');
-    } else if (err.response?.status === 404) {
-      alert('Client not found.');
+    if (err.response?.status === 409) {
+      const force = window.confirm('This client is in use. Do you want to force delete?');
+      if (force) {
+        try {
+          await axios.delete(`/api/clients/${id}?force=true`);
+          alert('Client and associated data deleted');
+          loadClients();
+        } catch {
+          alert('Force delete failed.');
+        }
+      }
     } else {
-      alert('Server error while deleting client.');
+      alert('Delete failed.');
     }
   }
 };
+
   const deleteInventory = async (id) => {
   if (!window.confirm('Are you sure you want to delete this inventory item?')) return;
 
@@ -111,13 +125,19 @@ const deleteClient = async (id) => {
     alert('Inventory deleted successfully');
     loadInventory();
   } catch (err) {
-    console.error('Delete inventory failed:', err);
-    if (err.response?.status === 400) {
-      alert('This Item is in use and cannot be deleted.'); 
-    } else if (err.response?.status === 404) {
-      alert('Inventory item not found.');
+    if (err.response?.status === 409) {
+      const force = window.confirm('This item is in use. Do you want to force delete?');
+      if (force) {
+        try {
+          await axios.delete(`/api/inventory/${id}?force=true`);
+          alert('Item and related data deleted');
+          loadInventory();
+        } catch {
+          alert('Force delete failed.');
+        }
+      }
     } else {
-      alert('Server error while deleting inventory.');
+      alert('Delete failed.');
     }
   }
 };
