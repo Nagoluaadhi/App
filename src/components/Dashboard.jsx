@@ -35,7 +35,10 @@ export default function Dashboard() {
         </div>
         <div className="bg-white p-4 shadow rounded">
           <h3 className="text-lg font-semibold text-gray-700">💰 Total Balance</h3>
-          <p className="text-2xl text-indigo-600">{stats.totalBalance}</p>
+          <p className="text-2xl text-indigo-600">
+  {String(stats.totalBalance)
+    .split('')
+    .reduce((sum, digit) => sum + parseInt(digit), 0)}</p>
       </div>
 
       </div>
