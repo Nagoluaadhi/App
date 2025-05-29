@@ -74,8 +74,9 @@ const loadInventory = async () => {
     loadUsers();
   } catch (err) {
     console.error('Delete user error:', err);
+
     if (err.response?.status === 400) {
-      alert('This user is in use and cannot be deleted.');
+      alert(err.response.data?.error || 'This user is in use and cannot be deleted.');
     } else if (err.response?.status === 404) {
       alert('User not found.');
     } else {
