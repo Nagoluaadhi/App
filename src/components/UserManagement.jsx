@@ -199,13 +199,6 @@ const deleteClient = async (id) => {
         />
         <input
           type="text"
-          placeholder="Model No"
-          value={inventoryForm.model_no}
-          onChange={(e) => setInventoryForm({ ...inventoryForm, model_no: e.target.value })}
-          className="p-2 border rounded"
-        />
-        <input
-          type="text"
           placeholder="Remark"
           value={inventoryForm.remark}
           onChange={(e) => setInventoryForm({ ...inventoryForm, remark: e.target.value })}
