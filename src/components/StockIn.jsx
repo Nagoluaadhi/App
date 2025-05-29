@@ -15,15 +15,17 @@ export default function StockIn() {
     qty: '',
     remark: ''
   });
-
+  const userRole = localStorage.getItem('role');
+  const user = JSON.parse(localStorage.getItem('user'));
   const [inventory, setInventory] = useState([]);
   const [clients, setClients] = useState([]);
   const [data, setData] = useState([]);
   const [scannerVisible, setScannerVisible] = useState(false);
   const [barcodes, setBarcodes] = useState([]);
+  const barcodeRefs = useRef([])
 
   const scanRef = useRef(null);
-  const user = JSON.parse(localStorage.getItem('user'));
+  
 
   const loadDropdowns = async () => {
     try {
@@ -138,7 +140,6 @@ export default function StockIn() {
   return (
     <div>
       <h2 className="text-lg font-bold mb-4">Stock In</h2>
-
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="p-2 border rounded" />
         <select value={form.inventory_id} onChange={(e) => setForm({ ...form, inventory_id: e.target.value })} className="p-2 border rounded">
@@ -168,12 +169,14 @@ export default function StockIn() {
         </div>
 
         <input
-          type="text"
-          placeholder="Invoice No"
-          value={form.invoice_no}
-          onChange={(e) => setForm({ ...form, invoice_no: e.target.value })}
-          className="p-2 border rounded"
-        />
+  type="text"
+  placeholder="Invoice No"
+  value={form.invoice_no}
+  onChange={(e) => setForm({ ...form, invoice_no: e.target.value })}
+  className="p-2 border rounded"
+  disabled={userRole === 'user'}  // disable if user role is "user"
+/>
+
 
         <input
           type="number"
@@ -202,18 +205,25 @@ export default function StockIn() {
           <h3 className="font-semibold mb-2">Enter Barcodes Manually</h3>
           <div className="grid grid-cols-5 gap-2">
             {barcodes.map((code, idx) => (
-              <input
-                key={idx}
-                type="text"
-                value={code}
-                onChange={(e) => {
-                  const updated = [...barcodes];
-                  updated[idx] = e.target.value;
-                  setBarcodes(updated);
-                }}
-                className="p-2 border border-gray-400 rounded"
-              />
-            ))}
+  <input
+    key={idx}
+    ref={el => barcodeRefs.current[idx] = el}
+    type="text"
+    value={code}
+    onChange={(e) => {
+      const updated = [...barcodes];
+      updated[idx] = e.target.value;
+      setBarcodes(updated);
+
+      // Auto-focus next input if exists and value is not empty
+      if (e.target.value && barcodeRefs.current[idx + 1]) {
+        barcodeRefs.current[idx + 1].focus();
+      }
+    }}
+    className="p-2 border border-gray-400 rounded"
+  />
+))}
+
           </div>
         </div>
       )}
