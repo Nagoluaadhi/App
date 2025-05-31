@@ -12,9 +12,10 @@ export default function StockIn() {
     client_id: '',
     barcode: '',
     invoice_no: '',
-    qty: '',
+    qty: '1',
     remark: ''
   });
+
   const userRole = localStorage.getItem('role');
   const user = JSON.parse(localStorage.getItem('user'));
   const [inventory, setInventory] = useState([]);
@@ -22,10 +23,8 @@ export default function StockIn() {
   const [data, setData] = useState([]);
   const [scannerVisible, setScannerVisible] = useState(false);
   const [barcodes, setBarcodes] = useState([]);
-  const barcodeRefs = useRef([])
-
+  const barcodeRefs = useRef([]);
   const scanRef = useRef(null);
-  
 
   const loadDropdowns = async () => {
     try {
@@ -48,32 +47,29 @@ export default function StockIn() {
   }, []);
 
   const handleScan = (value) => {
-  const qty = parseInt(form.qty || '1');
-  if (isNaN(qty) || qty < 1) {
-    alert("Please enter a valid quantity first.");
-    return;
-  }
+    const qty = parseInt(form.qty || '1');
+    if (isNaN(qty) || qty < 1) {
+      alert("Please enter a valid quantity first.");
+      return;
+    }
 
-  // Set scanned barcode as first, rest blank
-  const initialBarcodes = [value, ...Array(qty - 1).fill('')];
-  setForm(prev => ({ ...prev, barcode: value }));
-  setBarcodes(initialBarcodes);
-  setScannerVisible(false);
+    const initialBarcodes = [value, ...Array(qty - 1).fill('')];
+    setForm(prev => ({ ...prev, barcode: value }));
+    setBarcodes(initialBarcodes);
+    setScannerVisible(false);
 
-  // Delay focus until inputs are rendered
-  setTimeout(() => {
-    if (barcodeRefs.current[1]) {
-      barcodeRefs.current[1].focus();
-    }
-  }, 200); // 200ms ensures React DOM update
-};
-
+    setTimeout(() => {
+      if (barcodeRefs.current[1]) {
+        barcodeRefs.current[1].focus();
+      }
+    }, 200);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!user?.id) {
-      alert('User not logged in.');
+    if (!user?.id || isNaN(user.id)) {
+      alert('User not logged in or invalid user ID.');
       return;
     }
 
@@ -85,12 +81,18 @@ export default function StockIn() {
 
     try {
       for (const code of barcodes) {
-        await axios.post('/api/stockin', {
-          ...form,
+        const payload = {
+          date: form.date,
+          inventory_id: Number(form.inventory_id),
+          client_id: Number(form.client_id),
           barcode: code,
+          invoice_no: form.invoice_no,
           qty: 1,
-          user_id: user.id
-        });
+          remark: form.remark,
+          user_id: Number(user.id)
+        };
+        console.log('Submitting:', payload);
+        await axios.post('/api/stockin', payload);
       }
 
       setForm({
@@ -99,14 +101,14 @@ export default function StockIn() {
         client_id: '',
         barcode: '',
         invoice_no: '',
-        qty: '',
+        qty: '1',
         remark: ''
       });
       setBarcodes([]);
       loadDropdowns();
       scanRef.current?.focus();
     } catch (err) {
-      console.error('StockIn submission failed:', err);
+      console.error('StockIn submission failed:', err.response?.data || err);
       alert('Error submitting Stock IN.');
     }
   };
@@ -179,14 +181,13 @@ export default function StockIn() {
         </div>
 
         <input
-  type="text"
-  placeholder="Invoice No"
-  value={form.invoice_no}
-  onChange={(e) => setForm({ ...form, invoice_no: e.target.value })}
-  className="p-2 border rounded"
-  disabled={userRole === 'user'}  // disable if user role is "user"
-/>
-
+          type="text"
+          placeholder="Invoice No"
+          value={form.invoice_no}
+          onChange={(e) => setForm({ ...form, invoice_no: e.target.value })}
+          className="p-2 border rounded"
+          disabled={userRole === 'user'}
+        />
 
         <input
           type="number"
@@ -214,30 +215,28 @@ export default function StockIn() {
         <div className="my-4">
           <h3 className="font-semibold mb-2">Enter Barcodes Manually</h3>
           <div className="flex flex-wrap gap-3">
-  {barcodes.map((code, idx) => (
-    <input
-  key={idx}
-  ref={el => (barcodeRefs.current[idx] = el)}
-  type="text"
-  value={code}
-  onChange={(e) => {
-    const updated = [...barcodes];
-    updated[idx] = e.target.value;
-    setBarcodes(updated);
-  }}
-  onKeyDown={(e) => {
-    // 👉 On Enter, go to next input
-    if (e.key === 'Enter' && barcodeRefs.current[idx + 1]) {
-      e.preventDefault();
-      barcodeRefs.current[idx + 1].focus();
-    }
-  }}
-  readOnly={idx === 0} // optional: lock first scanned field
-  className="p-2 border border-gray-400 rounded"
-/>
-
-  ))}
-    </div>
+            {barcodes.map((code, idx) => (
+              <input
+                key={idx}
+                ref={el => (barcodeRefs.current[idx] = el)}
+                type="text"
+                value={code}
+                onChange={(e) => {
+                  const updated = [...barcodes];
+                  updated[idx] = e.target.value;
+                  setBarcodes(updated);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && barcodeRefs.current[idx + 1]) {
+                    e.preventDefault();
+                    barcodeRefs.current[idx + 1].focus();
+                  }
+                }}
+                readOnly={idx === 0}
+                className="p-2 border border-gray-400 rounded"
+              />
+            ))}
+          </div>
         </div>
       )}
 
