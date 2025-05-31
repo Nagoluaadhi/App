@@ -45,13 +45,14 @@ function App() {
             </>
           )}
 
-          {user?.role === 'supervisor' && (
-            <>
-              <Route path="stockout" element={<Stockout />} />
-              <Route path="report" element={<Report />} />
-            </>
-          )}
-
+          {user?.role === 'branch-office' && (
+  <>
+    <Route path="dashboard" element={<Dashboard clientOnly />} />
+    <Route path="stockout" element={<Stockout />} />
+    <Route path="services" element={<Services />} />
+    <Route path="report" element={<Report clientOnly />} />
+  </>
+)}
           {user?.role === 'user' && (
             <>
             <Route path="dashboard" element={<Dashboard />} />  
