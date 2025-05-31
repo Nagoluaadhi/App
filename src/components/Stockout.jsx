@@ -190,14 +190,17 @@ export default function Stockout() {
         </div>
 
         {userRole !== 'user' && (
-          <input
-            type="text"
-            placeholder="Invoice No"
-            value={form.invoice_no}
-            onChange={(e) => setForm({ ...form, invoice_no: e.target.value })}
-            className="p-2 border rounded"
-          />
-        )}
+  <div className="md:col-span-1">
+    <input
+      type="text"
+      placeholder="Invoice No"
+      value={form.invoice_no}
+      onChange={(e) => setForm({ ...form, invoice_no: e.target.value })}
+      className="p-2 border rounded"
+    />
+  </div>
+)}
+
         <input type="number" placeholder="Quantity" value={form.qty} onChange={(e) => {
           const q = parseInt(e.target.value || '0');
           setForm({ ...form, qty: e.target.value });
