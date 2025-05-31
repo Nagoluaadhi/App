@@ -37,12 +37,26 @@ export default function Services() {
     setServices(svc.data);
   };
 
-  const handleScan = (value) => {
-    const qty = parseInt(form.qty || '1');
-    if (isNaN(qty) || qty < 1) {
-      alert('Please enter quantity first');
-      return;
-    }
+ const handleScan = (value) => {
+  const qty = parseInt(form.qty || '1');
+  if (isNaN(qty) || qty < 1) {
+    alert("Please enter a valid quantity first.");
+    return;
+  }
+
+  const initialBarcodes = [value, ...Array(qty - 1).fill('')];
+  setForm(prev => ({ ...prev, barcode: value }));
+  setBarcodes(initialBarcodes);
+  setScannerVisible(false);
+
+  setTimeout(() => {
+    if (barcodeRefs.current[1]) {
+      barcodeRefs.current[1].focus();
+    }
+  }, 200);
+};
+
+
     const initialBarcodes = [value, ...Array(qty - 1).fill('')];
     setForm({ ...form, barcode: value });
     setBarcodes(initialBarcodes);
@@ -157,38 +171,34 @@ export default function Services() {
         </div>
       </form>
 
-      {barcodes.length > 0 && (
-        <div className="my-4">
-          <h3 className="font-semibold mb-2">Enter Barcodes</h3>
-          <div className="grid grid-cols-5 gap-2">
-            {barcodes.map((code, idx) => (
-      <input
-        key={idx}
-        ref={el => (barcodeRefs.current[idx] = el)}
-        type="text"
-        value={code}
-        onChange={(e) => {
-          const updated = [...barcodes];
-          updated[idx] = e.target.value;
-          setBarcodes(updated);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && barcodeRefs.current[idx + 1]) {
-            e.preventDefault();
-            barcodeRefs.current[idx + 1].focus();
-          }
-        }}
-        readOnly={idx === 0}
-        className="p-2 border border-gray-400 rounded"
-      />
-    ))}
-    className="p-2 border border-gray-400 rounded"
-  />
-))}
-
-          </div>
-        </div>
-      )}
+    {barcodes.length > 0 && (
+  <div className="my-4">
+    <h3 className="font-semibold mb-2">Enter Barcodes Manually</h3>
+    <div className="flex flex-wrap gap-3">
+      {barcodes.map((code, idx) => (
+        <input
+          key={idx}
+          ref={el => (barcodeRefs.current[idx] = el)}
+          type="text"
+          value={code}
+          onChange={(e) => {
+            const updated = [...barcodes];
+            updated[idx] = e.target.value;
+            setBarcodes(updated);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && barcodeRefs.current[idx + 1]) {
+              e.preventDefault();
+              barcodeRefs.current[idx + 1].focus();
+            }
+          }}
+          readOnly={idx === 0}
+          className="p-2 border border-gray-400 rounded"
+        />
+      ))}
+    </div>
+  </div>
+)}
 
       <div className="flex gap-4 mb-4">
         <button onClick={() => exportToExcel(services, 'services_report')} className="bg-green-500 text-white px-4 py-1 rounded">Export Excel</button>
