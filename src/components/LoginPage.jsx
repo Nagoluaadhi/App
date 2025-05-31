@@ -16,7 +16,7 @@ export default function LoginPage({ onLogin }) {
       role: form.role.toLowerCase() // 🔁 force lowercase
     };
 
-    const res = await axios.post('/api/users/login', payload);
+    const res = await axios.post('http://43.204.112.199:3001/api/users/login', payload);
     const user = res.data;
 
     localStorage.setItem('user', JSON.stringify(user));
