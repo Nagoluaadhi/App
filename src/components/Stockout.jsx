@@ -78,38 +78,60 @@ export default function Stockout() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!user || !user.id) return alert('User not logged in');
+  e.preventDefault();
 
-    const qty = parseInt(form.qty);
-    if (!form.date || !form.inventory_id || !form.client_id || !qty || barcodes.length !== qty || barcodes.includes('')) {
-  console.warn("⛔ Validation failed", { form, barcodes });
-  return alert('Please fill all fields and ensure all barcodes are entered.');
-}
+  const qty = parseInt(form.qty);
 
-    for (const code of barcodes) {
-      await axios.post('/api/stockout', {
-        ...form,
-        barcode: code,
-        qty: 1,
-        user_id: user.id
-      });
-    }
+  // Validate fields
+  if (!user?.id || !form.date || !form.inventory_id || !form.client_id || !qty || barcodes.length !== qty || barcodes.includes('')) {
+    console.warn("⛔ Validation failed", {
+      userId: user?.id,
+      form,
+      barcodes
+    });
+    return alert('Please fill all fields and ensure all barcodes are filled correctly.');
+  }
 
-    setForm({
-      date: '',
-      inventory_id: '',
-      client_id: '',
-      barcode: '',
-      invoice_no: '',
-      qty: '',
-      remark: ''
-    });
-    setBarcodes([]);
-    setScannerVisible(false);
-    loadDropdowns();
-    loadBalances();
-  };
+  for (const code of barcodes) {
+    try {
+      console.log("📤 Sending:", {
+        ...form,
+        barcode: code,
+        qty: 1,
+        user_id: user.id
+      });
+
+      const res = await axios.post('/api/stockout', {
+        ...form,
+        barcode: code,
+        qty: 1,
+        user_id: user.id
+      });
+
+      console.log("✅ Response:", res.data);
+    } catch (err) {
+      console.error("❌ Server error:", err.response?.data || err.message);
+      alert(`Server rejected the request: ${err.response?.data?.error || err.message}`);
+      return;
+    }
+  }
+
+  // Reset form
+  setForm({
+    date: new Date().toISOString().split('T')[0],
+    inventory_id: '',
+    client_id: '',
+    barcode: '',
+    invoice_no: '',
+    qty: '',
+    remark: ''
+  });
+  setBarcodes([]);
+  setScannerVisible(false);
+  loadDropdowns();
+  loadBalances();
+};
+
 
   const exportPDF = () => {
     const input = document.getElementById('stockout-table');
