@@ -162,21 +162,26 @@ export default function Services() {
           <h3 className="font-semibold mb-2">Enter Barcodes</h3>
           <div className="grid grid-cols-5 gap-2">
             {barcodes.map((code, idx) => (
-  <input
-    key={idx}
-    ref={el => barcodeRefs.current[idx] = el}
-    type="text"
-    value={code}
-    onChange={(e) => {
-      const updated = [...barcodes];
-      updated[idx] = e.target.value;
-      setBarcodes(updated);
-
-      // Auto-focus next input
-      if (e.target.value && barcodeRefs.current[idx + 1]) {
-        barcodeRefs.current[idx + 1].focus();
-      }
-    }}
+      <input
+        key={idx}
+        ref={el => (barcodeRefs.current[idx] = el)}
+        type="text"
+        value={code}
+        onChange={(e) => {
+          const updated = [...barcodes];
+          updated[idx] = e.target.value;
+          setBarcodes(updated);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && barcodeRefs.current[idx + 1]) {
+            e.preventDefault();
+            barcodeRefs.current[idx + 1].focus();
+          }
+        }}
+        readOnly={idx === 0}
+        className="p-2 border border-gray-400 rounded"
+      />
+    ))}
     className="p-2 border border-gray-400 rounded"
   />
 ))}
