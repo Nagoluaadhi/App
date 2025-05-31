@@ -17,6 +17,10 @@ export default function Report() {
   const loadReports = async () => {
     const res = await axios.get('/api/report', { params: filter });
     setData(res.data);
+   if (props.clientOnly) {
+  const clientId = localStorage.getItem('client_id');
+  finalFilter.client_id = clientId;
+   }
   };
 
   useEffect(() => {
@@ -47,10 +51,12 @@ export default function Report() {
           <option value="in">Stock In</option>
           <option value="out">Stock Out</option>
         </select>
-        <select onChange={e => setFilter({ ...filter, client_id: e.target.value })} className="p-2 border rounded">
-          <option value="">All Clients</option>
-          {clients.map(cli => <option key={cli.id} value={cli.id}>{cli.client_name}</option>)}
-        </select>
+        {!props.clientOnly && (
+  <select onChange={e => setFilter({ ...filter, client_id: e.target.value })} className="p-2 border rounded">
+    <option value="">All Clients</option>
+    {clients.map(cli => <option key={cli.id} value={cli.id}>{cli.client_name}</option>)}
+  </select>
+)}
         <input type="date" onChange={e => setFilter({ ...filter, from: e.target.value })} className="p-2 border rounded" />
         <input type="date" onChange={e => setFilter({ ...filter, to: e.target.value })} className="p-2 border rounded" />
         <button onClick={loadReports} className="bg-blue-600 text-white px-4 py-2 rounded col-span-1 md:col-span-4">Filter</button>
