@@ -24,12 +24,17 @@ export default function Stockout() {
   const [inventoryQty, setInventoryQty] = useState(null);
   const [clientQty, setClientQty] = useState(null);
   const [userUsageQty, setUserUsageQty] = useState(null);
-  const user = JSON.parse(localStorage.getItem('user'));
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
   const userRole = localStorage.getItem('role');
-  const barcodeRefs = useRef([])
+  const barcodeRefs = useRef([]);
   const today = new Date().toISOString().split('T')[0];
+
   useEffect(() => {
     loadDropdowns();
+  }, []);
+
+  useEffect(() => {
+    setForm(prev => ({ ...prev, date: today }));
   }, []);
 
   useEffect(() => {
@@ -78,60 +83,54 @@ export default function Stockout() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const qty = parseInt(form.qty);
+    const qty = parseInt(form.qty);
 
-  // Validate fields
-  if (!user?.id || !form.date || !form.inventory_id || !form.client_id || !qty || barcodes.length !== qty || barcodes.includes('')) {
-    console.warn("⛔ Validation failed", {
-      userId: user?.id,
-      form,
-      barcodes
-    });
-    return alert('Please fill all fields and ensure all barcodes are filled correctly.');
-  }
+    if (!user?.id || !form.date || !form.inventory_id || !form.client_id || !qty || barcodes.length !== qty || barcodes.includes('')) {
+      console.warn("⛔ Validation failed", { userId: user?.id, form, barcodes });
+      return alert('Please fill all fields and ensure all barcodes are filled correctly.');
+    }
 
-  for (const code of barcodes) {
-    try {
-      console.log("📤 Sending:", {
-        ...form,
-        barcode: code,
-        qty: 1,
-        user_id: user.id
-      });
+    for (const code of barcodes) {
+      try {
+        console.log("📤 Sending:", {
+          ...form,
+          barcode: code,
+          qty: 1,
+          user_id: user.id
+        });
 
-      const res = await axios.post('/api/stockout', {
-        ...form,
-        barcode: code,
-        qty: 1,
-        user_id: user.id
-      });
+        const res = await axios.post('/api/stockout', {
+          ...form,
+          barcode: code,
+          qty: 1,
+          user_id: user.id
+        });
 
-      console.log("✅ Response:", res.data);
-    } catch (err) {
-      console.error("❌ Server error:", err.response?.data || err.message);
-      alert(`Server rejected the request: ${err.response?.data?.error || err.message}`);
-      return;
-    }
-  }
+        console.log("✅ Response:", res.data);
+      } catch (err) {
+        console.error("❌ Server error:", err.response?.data || err.message);
+        const message = err.response?.data?.error || err.response?.statusText || err.message || 'Unknown error';
+        alert(`Server rejected the request: ${message}`);
+        return;
+      }
+    }
 
-  // Reset form
-  setForm({
-    date: new Date().toISOString().split('T')[0],
-    inventory_id: '',
-    client_id: '',
-    barcode: '',
-    invoice_no: '',
-    qty: '',
-    remark: ''
-  });
-  setBarcodes([]);
-  setScannerVisible(false);
-  loadDropdowns();
-  loadBalances();
-};
-
+    setForm({
+      date: today,
+      inventory_id: '',
+      client_id: '',
+      barcode: '',
+      invoice_no: '',
+      qty: '',
+      remark: ''
+    });
+    setBarcodes([]);
+    setScannerVisible(false);
+    loadDropdowns();
+    loadBalances();
+  };
 
   const exportPDF = () => {
     const input = document.getElementById('stockout-table');
@@ -191,16 +190,16 @@ export default function Stockout() {
         </div>
 
         {userRole !== 'user' && (
-  <input
-    type="text"
-    placeholder="Invoice No"
-    value={form.invoice_no}
-    onChange={(e) => setForm({ ...form, invoice_no: e.target.value })}
-    className="p-2 border rounded"
-  />
-)}
+          <input
+            type="text"
+            placeholder="Invoice No"
+            value={form.invoice_no}
+            onChange={(e) => setForm({ ...form, invoice_no: e.target.value })}
+            className="p-2 border rounded"
+          />
+        )}
         <input type="number" placeholder="Quantity" value={form.qty} onChange={(e) => {
-          const q = parseInt(e.target.value || '1');
+          const q = parseInt(e.target.value || '0');
           setForm({ ...form, qty: e.target.value });
           if (form.barcode && q > 0) {
             const updated = [form.barcode, ...Array(q - 1).fill('')];
@@ -219,25 +218,22 @@ export default function Stockout() {
           <h3 className="font-semibold mb-2">Enter Barcodes</h3>
           <div className="grid grid-cols-5 gap-2">
             {barcodes.map((code, idx) => (
-  <input
-    key={idx}
-    ref={el => barcodeRefs.current[idx] = el}
-    type="text"
-    value={code}
-    onChange={(e) => {
-      const updated = [...barcodes];
-      updated[idx] = e.target.value;
-      setBarcodes(updated);
-
-      // Auto-focus next input if exists and value is not empty
-      if (e.target.value && barcodeRefs.current[idx + 1]) {
-        barcodeRefs.current[idx + 1].focus();
-      }
-    }}
-    className="p-2 border border-gray-400 rounded"
-  />
-))}
-
+              <input
+                key={idx}
+                ref={el => barcodeRefs.current[idx] = el}
+                type="text"
+                value={code}
+                onChange={(e) => {
+                  const updated = [...barcodes];
+                  updated[idx] = e.target.value;
+                  setBarcodes(updated);
+                  if (e.target.value && barcodeRefs.current[idx + 1]) {
+                    barcodeRefs.current[idx + 1].focus();
+                  }
+                }}
+                className="p-2 border border-gray-400 rounded"
+              />
+            ))}
           </div>
         </div>
       )}
