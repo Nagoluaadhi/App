@@ -17,6 +17,7 @@ function LoginPage({ setUser }) {
       });
       localStorage.setItem('user', JSON.stringify(res.data));
       localStorage.setItem('role', res.data.role);
+      localStorage.setItem('client_id', res.data.client_id);
       setUser(res.data);
       navigate('/app/dashboard');
     } catch (err) {
@@ -46,7 +47,7 @@ function LoginPage({ setUser }) {
           onChange={(e) => setRole(e.target.value)}
         >
           <option value="admin">Admin</option>
-          <option value="supervisor">Supervisor</option>
+          <option value="branch-office">Branch Office</option>
           <option value="user">User</option>
         </select>
         <button onClick={handleLogin} className="w-full bg-orange-500 text-white py-2 rounded">
