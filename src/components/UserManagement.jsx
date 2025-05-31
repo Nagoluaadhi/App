@@ -3,8 +3,7 @@ import axios from 'axios';
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]);
-  const [form, setForm] = useState({ username: '', password: '', role: '' });
-
+  const [form, setForm] = useState({ username: '', password: '', role: '', client_id: '' });
   const [inventoryForm, setInventoryForm] = useState({ item_name: '', remark: '' });
   const [clientForm, setClientForm] = useState({ client_name: '', address: '' });
   const [inventory, setInventory] = useState([]);
@@ -41,15 +40,13 @@ const loadInventory = async () => {
   }
 
   try {
-    await axios.post('/api/users', form);
-    setForm({ username: '', password: '', role: '' });
-    loadUsers();
-  } catch (err) {
-    console.error('User creation error:', err?.response?.data || err.message);
-    alert(err?.response?.data?.error || 'User creation failed.');
-  }
-};
-
+      await axios.post('/api/users', form);
+      alert('User created successfully');
+      setForm({ username: '', password: '', role: '', client_id: '' });
+    } catch (err) {
+      alert('Failed to create user');
+    }
+  };
 
   const handleInventorySubmit = async (e) => {
     e.preventDefault();
@@ -93,29 +90,28 @@ const loadInventory = async () => {
 
 
 const deleteClient = async (id) => {
-  if (!window.confirm('Are you sure you want to delete this client?')) return;
-
-  try {
-    await axios.delete(`/api/clients/${id}`);
-    alert('Client deleted successfully');
-    loadClients();
-  } catch (err) {
-    if (err.response?.status === 409) {
-      const force = window.confirm('This client is in use. Do you want to force delete?');
-      if (force) {
-        try {
-          await axios.delete(`/api/clients/${id}?force=true`);
-          alert('Client and associated data deleted');
-          loadClients();
-        } catch {
-          alert('Force delete failed.');
+    if (!window.confirm('Are you sure you want to delete this client?')) return;
+    try {
+      await axios.delete(`/api/clients/${id}`);
+      alert('Client deleted successfully');
+      loadClients();
+    } catch (err) {
+      if (err.response?.status === 409) {
+        const force = window.confirm('This client is in use. Do you want to force delete?');
+        if (force) {
+          try {
+            await axios.delete(`/api/clients/${id}?force=true`);
+            alert('Client and associated data deleted');
+            loadClients();
+          } catch {
+            alert('Force delete failed.');
+          }
         }
+      } else {
+        alert('Delete failed.');
       }
-    } else {
-      alert('Delete failed.');
     }
-  }
-};
+  };
 
   const deleteInventory = async (id) => {
   if (!window.confirm('Are you sure you want to delete this inventory item?')) return;
@@ -145,7 +141,7 @@ const deleteClient = async (id) => {
 
 
 
-  return (
+   return (
     <div className="p-4">
       <h2 className="text-lg font-bold mb-4">User Management</h2>
 
@@ -166,21 +162,34 @@ const deleteClient = async (id) => {
         />
         <select
           value={form.role}
-          onChange={(e) => setForm({ ...form, role: e.target.value })}
+          onChange={(e) => setForm({ ...form, role: e.target.value, client_id: '' })}
           className="p-2 border rounded"
         >
           <option value="">Select Role</option>
           <option value="admin">Admin</option>
+          <option value="branch-office">Branch Office</option>
           <option value="user">User</option>
-          <option value="supervisor">Supervisor</option>
         </select>
-        <div className="md:col-span-3 flex justify-left">
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-6 py-2 rounded w-auto">
+
+        {form.role === 'branch-office' && (
+          <select
+            value={form.client_id}
+            onChange={(e) => setForm({ ...form, client_id: e.target.value })}
+            className="p-2 border rounded"
+            required
+          >
+            <option value="">Select Client</option>
+            {clients.map(cli => (
+              <option key={cli.id} value={cli.id}>
+                {cli.client_name}
+              </option>
+            ))}
+          </select>
+        )}
+
+        <button type="submit" className="p-2 bg-blue-600 text-white rounded col-span-1 md:col-span-3">
           Create User
         </button>
-        </div>
       </form>
 
       <h3 className="text-md font-semibold mb-2">Users</h3>
