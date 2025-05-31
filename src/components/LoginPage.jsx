@@ -16,6 +16,7 @@ function LoginPage({ setUser }) {
         role
       });
       localStorage.setItem('user', JSON.stringify(res.data));
+      localStorage.setItem('role', response.data.role);
       setUser(res.data);
       navigate('/app/dashboard');
     } catch (err) {
