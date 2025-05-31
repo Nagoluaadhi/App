@@ -12,9 +12,19 @@ export default function Dashboard() {
   });
 
   const fetchStats = async () => {
-    const res = await axios.get('/api/dashboard');
-    setStats(res.data);
-  };
+  const role = localStorage.getItem('role');
+  const clientId = localStorage.getItem('client_id');
+
+  let url = '/api/dashboard';
+  const config = {};
+
+  if (role === 'branch-office' && clientId) {
+    config.params = { client_id: clientId };
+  }
+
+  const res = await axios.get(url, config);
+  setStats(res.data);
+};
 
   useEffect(() => {
     fetchStats();
@@ -42,43 +52,45 @@ export default function Dashboard() {
       </div>
 
       </div>
-
-      <h3 className="text-lg font-semibold mb-2">Per User StockOut</h3>
-      <table className="w-full border text-sm mb-6">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="border px-2">User</th>
-            <th className="border px-2">Total Stock Out</th>
+{localStorage.getItem('role') === 'admin' && (
+  <>
+    <h3 className="text-lg font-semibold mb-2">Per User StockOut</h3>
+    <table className="w-full border text-sm mb-6">
+      <thead className="bg-gray-100">
+        <tr>
+          <th className="border px-2">User</th>
+          <th className="border px-2">Total Stock Out</th>
+        </tr>
+      </thead>
+      <tbody>
+        {stats.perUser.map((u, i) => (
+          <tr key={i}>
+            <td className="border px-2">{u.username}</td>
+            <td className="border px-2">{u.total}</td>
           </tr>
-        </thead>
-        <tbody>
-          {stats.perUser.map((u, i) => (
-            <tr key={i}>
-              <td className="border px-2">{u.username}</td>
-              <td className="border px-2">{u.total}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <h3 className="text-lg font-semibold mb-2">Per User StockIn</h3>
-<table className="w-full border text-sm mb-6">
-  <thead className="bg-gray-100">
-    <tr>
-      <th className="border px-2">User</th>
-      <th className="border px-2">Total Stock In</th>
-    </tr>
-  </thead>
-  <tbody>
-    {stats.perUserIn.map((u, i) => (
-      <tr key={i}>
-        <td className="border px-2">{u.username}</td>
-        <td className="border px-2">{u.total}</td>
-      </tr>
-    ))}
-  </tbody>
-</table>
+        ))}
+      </tbody>
+    </table>
 
-
+    <h3 className="text-lg font-semibold mb-2">Per User StockIn</h3>
+    <table className="w-full border text-sm mb-6">
+      <thead className="bg-gray-100">
+        <tr>
+          <th className="border px-2">User</th>
+          <th className="border px-2">Total Stock In</th>
+        </tr>
+      </thead>
+      <tbody>
+        {stats.perUserIn.map((u, i) => (
+          <tr key={i}>
+            <td className="border px-2">{u.username}</td>
+            <td className="border px-2">{u.total}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </>
+)}
       <h3 className="text-lg font-semibold mb-2">Per Client Balance</h3>
       <table className="w-full border text-sm">
         <thead className="bg-gray-100">
