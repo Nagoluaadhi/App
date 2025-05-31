@@ -71,16 +71,27 @@ export default function Stockout() {
   };
 
   const handleScan = (value) => {
-    const qty = parseInt(form.qty || '1');
-    if (isNaN(qty) || qty < 1) {
-      alert('Please enter a valid quantity first.');
-      return;
-    }
-    const initialBarcodes = [value, ...Array(qty - 1).fill('')];
-    setForm(prev => ({ ...prev, barcode: value }));
-    setBarcodes(initialBarcodes);
-    setScannerVisible(false);
-  };
+  const qty = parseInt(form.qty || '1');
+  if (isNaN(qty) || qty < 1) {
+    alert("Please enter a valid quantity first.");
+    return;
+  }
+
+  // Fill first with scanned value, others empty
+  const initialBarcodes = [value, ...Array(qty - 1).fill('')];
+
+  setForm(prev => ({ ...prev, barcode: value }));
+  setBarcodes(initialBarcodes);
+  setScannerVisible(false);
+
+  // Focus next input after setting (with a slight delay to allow rendering)
+  setTimeout(() => {
+    if (barcodeRefs.current[1]) {
+      barcodeRefs.current[1].focus();
+    }
+  }, 100);
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
