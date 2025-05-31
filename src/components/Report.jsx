@@ -4,7 +4,7 @@ import { exportToExcel } from '../utils/exportExcel';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-export default function Report() {
+export default function Report(props) {
   const [data, setData] = useState([]);
   const [filter, setFilter] = useState({ type: '', client_id: '', from: '', to: '' });
   const [clients, setClients] = useState([]);
@@ -15,13 +15,16 @@ export default function Report() {
   };
 
   const loadReports = async () => {
-    const res = await axios.get('/api/report', { params: filter });
-    setData(res.data);
-   if (props.clientOnly) {
-  const clientId = localStorage.getItem('client_id');
-  finalFilter.client_id = clientId;
-   }
-  };
+  const filterCopy = { ...filter };
+
+  if (props.clientOnly) {
+    const clientId = localStorage.getItem('client_id');
+    filterCopy.client_id = clientId;
+  }
+
+  const res = await axios.get('/api/report', { params: filterCopy });
+  setData(res.data);
+};
 
   useEffect(() => {
     loadClients();
