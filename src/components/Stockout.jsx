@@ -83,8 +83,9 @@ export default function Stockout() {
 
     const qty = parseInt(form.qty);
     if (!form.date || !form.inventory_id || !form.client_id || !qty || barcodes.length !== qty || barcodes.includes('')) {
-      return alert('Fill all fields and ensure all barcodes are entered.');
-    }
+  console.warn("⛔ Validation failed", { form, barcodes });
+  return alert('Please fill all fields and ensure all barcodes are entered.');
+}
 
     for (const code of barcodes) {
       await axios.post('/api/stockout', {
@@ -167,7 +168,15 @@ export default function Stockout() {
           {scannerVisible && <BarcodeScanner onScan={handleScan} />}
         </div>
 
-        <input type="text" placeholder="Invoice No" value={form.invoice_no} onChange={(e) => setForm({ ...form, invoice_no: e.target.value })} className="p-2 border rounded" disabled={userRole === 'user'}/>
+        {userRole !== 'user' && (
+  <input
+    type="text"
+    placeholder="Invoice No"
+    value={form.invoice_no}
+    onChange={(e) => setForm({ ...form, invoice_no: e.target.value })}
+    className="p-2 border rounded"
+  />
+)}
         <input type="number" placeholder="Quantity" value={form.qty} onChange={(e) => {
           const q = parseInt(e.target.value || '1');
           setForm({ ...form, qty: e.target.value });
