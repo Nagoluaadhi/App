@@ -55,15 +55,7 @@ export default function Services() {
     }
   }, 200);
 };
-
-
-    const initialBarcodes = [value, ...Array(qty - 1).fill('')];
-    setForm({ ...form, barcode: value });
-    setBarcodes(initialBarcodes);
-    setScannerVisible(false);
-  };
-
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user || !user.id) return alert('User not logged in');
 
