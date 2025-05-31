@@ -216,22 +216,26 @@ export default function StockIn() {
           <div className="grid grid-cols-5 gap-2">
   {barcodes.map((code, idx) => (
     <input
-      key={idx}
-      ref={el => barcodeRefs.current[idx] = el}
-      type="text"
-      value={code}
-      onChange={(e) => {
-        const updated = [...barcodes];
-        updated[idx] = e.target.value;
-        setBarcodes(updated);
+  key={idx}
+  ref={el => (barcodeRefs.current[idx] = el)}
+  type="text"
+  value={code}
+  onChange={(e) => {
+    const updated = [...barcodes];
+    updated[idx] = e.target.value;
+    setBarcodes(updated);
+  }}
+  onKeyDown={(e) => {
+    // 👉 On Enter, go to next input
+    if (e.key === 'Enter' && barcodeRefs.current[idx + 1]) {
+      e.preventDefault();
+      barcodeRefs.current[idx + 1].focus();
+    }
+  }}
+  readOnly={idx === 0} // optional: lock first scanned field
+  className="p-2 border border-gray-400 rounded"
+/>
 
-        // Auto-focus next input when current filled
-        if (e.target.value && barcodeRefs.current[idx + 1]) {
-          barcodeRefs.current[idx + 1].focus();
-        }
-      }}
-      className="p-2 border border-gray-400 rounded"
-    />
   ))}
 </div>
 
