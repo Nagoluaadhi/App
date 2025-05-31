@@ -8,24 +8,31 @@ export default function LoginPage({ onLogin }) {
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await axios.post('/api/users/login', form);
-      const user = res.data;
+  e.preventDefault();
+  try {
+    // Normalize role to lowercase before sending
+    const payload = {
+      ...form,
+      role: form.role.toLowerCase()
+    };
 
-      localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('role', user.role);
+    const res = await axios.post('/api/users/login', payload);
+    const user = res.data;
 
-      if (user.role === 'branch-office') {
-        localStorage.setItem('client_id', user.client_id); // 🆕 Save for filtering
-      }
+    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('role', user.role);
 
-      onLogin(user.id, user.role); // used in App.js
-      navigate('/dashboard');
-    } catch (err) {
-      setError(err.response?.data?.error || 'Login failed');
-    }
-  };
+    if (user.role === 'branch-office') {
+      localStorage.setItem('client_id', user.client_id); // 🆕 Save for filtering
+    }
+
+    onLogin(user.id, user.role); // used in App.js
+    navigate('/dashboard');
+  } catch (err) {
+    setError(err.response?.data?.error || 'Login failed');
+  }
+};
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
