@@ -18,12 +18,14 @@ function Layout({ user }) {
     </>
   )}
 
-  {user?.role === 'supervisor' && (
-    <>
-      <Link to="/app/outward" className="hover:text-orange-500">Outward</Link>
-      <Link to="/app/report" className="hover:text-orange-500">Report</Link>
-    </>
-  )}
+  {user?.role === 'branch-office' && (
+  <>
+    <Link to="/app/dashboard" className="hover:text-orange-500">Dashboard</Link>
+    <Link to="/app/stockout" className="hover:text-orange-500">Outward</Link>
+    <Link to="/app/services" className="hover:text-orange-500">Services</Link>
+    <Link to="/app/report" className="hover:text-orange-500">Report</Link>
+  </>
+)}
 
   {user?.role === 'user' && (
     <>
