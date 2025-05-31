@@ -9,25 +9,25 @@ export default function Report(props) {
   const [filter, setFilter] = useState({ type: '', client_id: '', from: '', to: '' });
   const [clients, setClients] = useState([]);
 
+  const role = localStorage.getItem('role');
+  const clientId = localStorage.getItem('client_id');
+
   const loadClients = async () => {
     const res = await axios.get('/api/clients');
     setClients(res.data);
   };
 
   const loadReports = async () => {
-  const filterCopy = { ...filter };
-
-  if (props.clientOnly) {
-    const clientId = localStorage.getItem('client_id');
-    filterCopy.client_id = clientId;
-  }
-
-  const res = await axios.get('/api/report', { params: filterCopy });
-  setData(res.data);
-};
+    const filterCopy = { ...filter };
+    if (role === 'branch-office' && clientId) {
+      filterCopy.client_id = clientId;
+    }
+    const res = await axios.get('/api/report', { params: filterCopy });
+    setData(res.data);
+  };
 
   useEffect(() => {
-    loadClients();
+    if (role !== 'branch-office') loadClients();
     loadReports();
   }, []);
 
@@ -54,12 +54,16 @@ export default function Report(props) {
           <option value="in">Stock In</option>
           <option value="out">Stock Out</option>
         </select>
-        {!props.clientOnly && (
-  <select onChange={e => setFilter({ ...filter, client_id: e.target.value })} className="p-2 border rounded">
-    <option value="">All Clients</option>
-    {clients.map(cli => <option key={cli.id} value={cli.id}>{cli.client_name}</option>)}
-  </select>
-)}
+
+        {role !== 'branch-office' && (
+          <select onChange={e => setFilter({ ...filter, client_id: e.target.value })} className="p-2 border rounded">
+            <option value="">All Clients</option>
+            {clients.map(cli => (
+              <option key={cli.id} value={cli.id}>{cli.client_name}</option>
+            ))}
+          </select>
+        )}
+
         <input type="date" onChange={e => setFilter({ ...filter, from: e.target.value })} className="p-2 border rounded" />
         <input type="date" onChange={e => setFilter({ ...filter, to: e.target.value })} className="p-2 border rounded" />
         <button onClick={loadReports} className="bg-blue-600 text-white px-4 py-2 rounded col-span-1 md:col-span-4">Filter</button>
