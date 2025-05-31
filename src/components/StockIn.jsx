@@ -213,6 +213,7 @@ export default function StockIn() {
       {barcodes.length > 0 && (
         <div className="my-4">
           <h3 className="font-semibold mb-2">Enter Barcodes Manually</h3>
+          <div className="flex flex-wrap gap-3">
   {barcodes.map((code, idx) => (
     <input
   key={idx}
@@ -236,7 +237,7 @@ export default function StockIn() {
 />
 
   ))}
-
+    </div>
         </div>
       )}
 
