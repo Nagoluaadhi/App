@@ -227,26 +227,31 @@ export default function Stockout() {
 
       {barcodes.length > 0 && (
         <div className="my-4">
-          <h3 className="font-semibold mb-2">Enter Barcodes</h3>
-          <div className="grid grid-cols-5 gap-2">
-            {barcodes.map((code, idx) => (
-              <input
-                key={idx}
-                ref={el => barcodeRefs.current[idx] = el}
-                type="text"
-                value={code}
-                onChange={(e) => {
-                  const updated = [...barcodes];
-                  updated[idx] = e.target.value;
-                  setBarcodes(updated);
-                  if (e.target.value && barcodeRefs.current[idx + 1]) {
-                    barcodeRefs.current[idx + 1].focus();
-                  }
-                }}
-                className="p-2 border border-gray-400 rounded"
-              />
-            ))}
-          </div>
+  <h3 className="font-semibold mb-2">Enter Barcodes Manually</h3>
+  <div className="flex flex-wrap gap-2">  {/* 👈 Add spacing between inputs */}
+    {barcodes.map((code, idx) => (
+      <input
+        key={idx}
+        ref={el => (barcodeRefs.current[idx] = el)}
+        type="text"
+        value={code}
+        onChange={(e) => {
+          const updated = [...barcodes];
+          updated[idx] = e.target.value;
+          setBarcodes(updated);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && barcodeRefs.current[idx + 1]) {
+            e.preventDefault();
+            barcodeRefs.current[idx + 1].focus();
+          }
+        }}
+        readOnly={idx === 0}
+        className="p-2 border border-gray-400 rounded"
+      />
+    ))}
+  </div>
+
         </div>
       )}
 
