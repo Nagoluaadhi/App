@@ -24,8 +24,8 @@ export default function Stockout() {
   const [inventoryQty, setInventoryQty] = useState(null);
   const [clientQty, setClientQty] = useState(null);
   const [userUsageQty, setUserUsageQty] = useState(null);
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const userRole = localStorage.getItem('role');
+  const user = JSON.parse(localStorage.getItem('user'));
+  const userRole = localStorage.getItem('role') || user?.role || '';
   const barcodeRefs = useRef([]);
   const today = new Date().toISOString().split('T')[0];
 
@@ -189,16 +189,14 @@ export default function Stockout() {
           {scannerVisible && <BarcodeScanner onScan={handleScan} />}
         </div>
 
-        {userRole !== 'user' && (
-  <div className="md:col-span-1">
-    <input
-      type="text"
-      placeholder="Invoice No"
-      value={form.invoice_no}
-      onChange={(e) => setForm({ ...form, invoice_no: e.target.value })}
-      className="p-2 border rounded"
-    />
-  </div>
+        {userRole?.toLowerCase() !== 'user' && (
+  <input
+    type="text"
+    placeholder="Invoice No"
+    value={form.invoice_no}
+    onChange={(e) => setForm({ ...form, invoice_no: e.target.value })}
+    className="p-2 border rounded"
+  />
 )}
 
         <input type="number" placeholder="Quantity" value={form.qty} onChange={(e) => {
