@@ -2,60 +2,69 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-function LoginPage({ setUser }) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState('admin');
-  const navigate = useNavigate();
+export default function LoginPage({ onLogin }) {
+  const [form, setForm] = useState({ username: '', password: '', role: '' });
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    try {
-      const res = await axios.post('/api/users/login', {
-        username,
-        password,
-        role
-      });
-      localStorage.setItem('user', JSON.stringify(res.data));
-      localStorage.setItem('role', res.data.role);
-      localStorage.setItem('client_id', res.data.client_id);
-      setUser(res.data);
-      navigate('/app/dashboard');
-    } catch (err) {
-      console.error('Login error:', err);
-      alert('Login failed. Please check credentials.');
-    }
-  };
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post('/api/users/login', form);
+      const user = res.data;
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md p-6 bg-white rounded shadow">
-        <h2 className="text-2xl font-bold mb-6 text-center">Sign in to Dashboard</h2>
-        <input
-          type="text"
-          placeholder="Email"
-          className="w-full p-2 border rounded mb-4"
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full p-2 border rounded mb-4"
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <select
-          className="w-full p-2 border rounded mb-6"
-          onChange={(e) => setRole(e.target.value)}
-        >
-          <option value="admin">Admin</option>
-          <option value="branch-office">Branch Office</option>
-          <option value="user">User</option>
-        </select>
-        <button onClick={handleLogin} className="w-full bg-orange-500 text-white py-2 rounded">
-          SIGN IN
-        </button>
-      </div>
-    </div>
-  );
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('role', user.role);
+
+      if (user.role === 'branch-office') {
+        localStorage.setItem('client_id', user.client_id); // 🆕 Save for filtering
+      }
+
+      onLogin(user.id, user.role); // used in App.js
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.error || 'Login failed');
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+        {error && <p className="text-red-600 mb-4 text-center">{error}</p>}
+        <form onSubmit={handleLogin} className="space-y-4">
+          <input
+            type="text"
+            placeholder="Username"
+            value={form.username}
+            onChange={(e) => setForm({ ...form, username: e.target.value })}
+            className="w-full p-2 border rounded"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            className="w-full p-2 border rounded"
+            required
+          />
+          <select
+            value={form.role}
+            onChange={(e) => setForm({ ...form, role: e.target.value })}
+            className="w-full p-2 border rounded"
+            required
+          >
+            <option value="">Select Role</option>
+            <option value="admin">Admin</option>
+            <option value="branch-office">Branch Office</option>
+            <option value="user">User</option>
+          </select>
+          <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
+            Login
+          </button>
+        </form>
+      </div>
+    </div>
+  );
 }
-
-export default LoginPage;
