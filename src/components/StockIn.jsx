@@ -48,7 +48,7 @@ export default function StockIn() {
   }, []);
 
   const handleScan = (value) => {
-    const qty = parseInt(form.qty || '1');
+    const qty = parseInt(form.qty?.toString().trim() || '1', 10);
     if (isNaN(qty) || qty < 1) {
       alert("Please enter a valid quantity first.");
       return;
